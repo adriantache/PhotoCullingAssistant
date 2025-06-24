@@ -3,6 +3,7 @@ package com.adriantache.photoculling.domain.data
 import com.adriantache.photoculling.domain.data.model.ShootData
 import com.adriantache.photoculling.domain.data.model.ShootsCollectionData
 
+// TODO: error handling
 interface ShootsCollectionDataSource {
     suspend fun getShoots(): ShootsCollectionData?
     suspend fun addShoot(shoot: ShootData)

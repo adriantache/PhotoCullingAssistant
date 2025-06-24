@@ -3,7 +3,10 @@ package com.adriantache.photoculling.domain.state
 import com.adriantache.photoculling.domain.ui.model.ShootUi
 
 sealed interface ShootState {
-    data class Init(val onInit: () -> Unit) : ShootState
+    data class Init(val onInit: (shootId: String) -> Unit) : ShootState
 
-    data class Content(val content: ShootUi) : ShootState
+    data class Content(
+        val shoot: ShootUi,
+        val onClickPhoto: (photoId: String) -> Unit,
+    ) : ShootState
 }

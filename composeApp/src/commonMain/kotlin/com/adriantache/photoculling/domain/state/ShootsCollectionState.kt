@@ -8,8 +8,9 @@ sealed interface ShootsCollectionState {
     data class Init(val onInit: () -> Unit) : ShootsCollectionState
 
     data class Content(
-        val content: ShootsCollectionUi,
+        val shoots: ShootsCollectionUi,
         val onAddShoot: () -> Unit,
+        val onOpenShoot: (shootId: String) -> Unit,
 //        val onDeleteShoot: () -> Unit, TODO
 //        val onEditShoot: () -> Unit, TODO
     ) : ShootsCollectionState
