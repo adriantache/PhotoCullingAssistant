@@ -8,7 +8,7 @@ fun ShootsCollectionUi.toEntity() = ShootsCollection(
     shoots = shoots.map { it.toEntity() }
 )
 
-fun ShootsCollection.toUi(selectedPhotoId: String) = ShootsCollectionUi(
+fun ShootsCollection.toUi() = ShootsCollectionUi(
     id = id,
-    shoots = shoots.map { it.toUi(selectedPhotoId) }
+    shoots = shoots.map { it.toUi(null) }
 )

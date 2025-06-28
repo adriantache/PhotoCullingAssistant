@@ -1,6 +1,5 @@
 package com.adriantache.photoculling.domain.state
 
-import com.adriantache.photoculling.domain.ui.model.PhotoUi
 import com.adriantache.photoculling.domain.ui.model.ShootUi
 import com.adriantache.photoculling.domain.ui.model.ShootsCollectionUi
 
@@ -16,9 +15,9 @@ sealed interface ShootsCollectionState {
     ) : ShootsCollectionState
 
     data class AddShoot(
-        val shoot: ShootUi?,
+        val shoot: ShootUi,
         val onSetName: (String) -> Unit,
-        val onSetPhotos: (List<PhotoUi>) -> Unit,
+        val onSetPhotos: (List<String>) -> Unit,
         val onSubmit: () -> Unit,
     ) : ShootsCollectionState
 }

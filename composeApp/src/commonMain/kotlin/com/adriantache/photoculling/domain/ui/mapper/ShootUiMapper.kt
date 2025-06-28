@@ -16,5 +16,6 @@ fun Shoot.toUi(selectedPhotoId: String?) = ShootUi(
     date = date,
     photos = photos.map { it.toUi() },
     progress = progress,
-    selectedPhotoId = selectedPhotoId
+    selectedPhotoId = selectedPhotoId,
+    hasPhotos = photos.isNotEmpty(),
 )

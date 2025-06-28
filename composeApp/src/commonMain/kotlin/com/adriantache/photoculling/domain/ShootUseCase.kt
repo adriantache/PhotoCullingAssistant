@@ -8,7 +8,6 @@ import com.adriantache.photoculling.domain.state.ShootState
 import com.adriantache.photoculling.domain.ui.mapper.toUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -45,7 +44,7 @@ object ShootUseCase {
 
         state.update {
             ShootState.Content(
-                shoot = shoot.toUi(),
+                shoot = shoot.toUi(selectedPhotoId),
                 onClickPhoto = {
                     selectedPhotoId = it
                     navigation.openPhoto(it)

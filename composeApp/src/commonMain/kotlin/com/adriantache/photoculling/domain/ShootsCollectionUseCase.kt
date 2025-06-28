@@ -1,24 +1,24 @@
 package com.adriantache.photoculling.domain
 
+import com.adriantache.photoculling.data.ShootsCollectionDataSourceImpl
 import com.adriantache.photoculling.domain.data.ShootsCollectionDataSource
 import com.adriantache.photoculling.domain.data.mapper.toData
 import com.adriantache.photoculling.domain.data.mapper.toEntity
+import com.adriantache.photoculling.domain.entity.Photo
 import com.adriantache.photoculling.domain.entity.Shoot
 import com.adriantache.photoculling.domain.entity.ShootsCollection
 import com.adriantache.photoculling.domain.navigation.NavigationUseCase
 import com.adriantache.photoculling.domain.state.ShootsCollectionState
-import com.adriantache.photoculling.domain.ui.mapper.toEntity
 import com.adriantache.photoculling.domain.ui.mapper.toUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 // TODO: DI
 object ShootsCollectionUseCase {
-    private val data: ShootsCollectionDataSource = TODO("ShootsCollectionDataSourceImpl")
+    private val data: ShootsCollectionDataSource = ShootsCollectionDataSourceImpl()
     private val navigation = NavigationUseCase
 
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -33,14 +33,15 @@ object ShootsCollectionUseCase {
     }
 
     private fun refreshStoredShoots() {
-        loadExistingShoots()
-        updateState()
+        scope.launch {
+            loadExistingShoots()
+            updateState()
+        }
+
     }
 
-    private fun loadExistingShoots() {
-        scope.launch {
-            shootsCollection = data.getShoots()?.toEntity() ?: ShootsCollection(shoots = emptyList())
-        }
+    private suspend fun loadExistingShoots() {
+        shootsCollection = data.getShoots()?.toEntity() ?: ShootsCollection(shoots = emptyList())
     }
 
     private fun onAddShoot() {
@@ -65,13 +66,13 @@ object ShootsCollectionUseCase {
         newShoot?.let { shoot ->
             state.update {
                 ShootsCollectionState.AddShoot(
-                    shoot = shoot.toUi(),
+                    shoot = shoot.toUi(selectedPhotoId = null),
                     onSetName = {
                         newShoot = newShoot?.changeName(it)
                         updateNewShootState()
                     },
                     onSetPhotos = { newPhotos ->
-                        newShoot = newShoot?.addPhotos(newPhotos.map { it.toEntity() })
+                        newShoot = newShoot?.addPhotos(newPhotos.map { Photo(uri = it) })
                         updateNewShootState()
                     },
                     onSubmit = {
