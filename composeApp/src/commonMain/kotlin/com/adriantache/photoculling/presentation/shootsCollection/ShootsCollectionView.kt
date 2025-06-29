@@ -13,11 +13,8 @@ import com.adriantache.photoculling.domain.state.ShootsCollectionState
 import com.adriantache.photoculling.presentation.util.Spacer
 
 @Composable
-fun ShootsCollectionView(
-    modifier: Modifier,
-    state: ShootsCollectionState.Content
-) {
-    Column(modifier.fillMaxSize().padding(16.dp)) {
+fun ShootsCollectionView(state: ShootsCollectionState.Content) {
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
         Text("Shoots")
 
         Spacer(16.dp)

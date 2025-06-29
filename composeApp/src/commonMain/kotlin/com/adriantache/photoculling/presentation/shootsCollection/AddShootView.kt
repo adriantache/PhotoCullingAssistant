@@ -15,10 +15,7 @@ import com.adriantache.photoculling.platform.pickPhotos
 import com.adriantache.photoculling.presentation.util.Spacer
 
 @Composable
-fun AddShootView(
-    modifier: Modifier,
-    localState: ShootsCollectionState.AddShoot
-) {
+fun AddShootView(localState: ShootsCollectionState.AddShoot) {
     val addedPhotos by getPhotoPickerResults().collectAsState(null)
     var showAddShootDialog by remember { mutableStateOf(false) }
 
@@ -34,7 +31,7 @@ fun AddShootView(
         showAddShootDialog = false
     }
 
-    Column(modifier.fillMaxSize().padding(16.dp)) {
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
         TextField(
             value = localState.shoot.name,
             onValueChange = localState.onSetName,
