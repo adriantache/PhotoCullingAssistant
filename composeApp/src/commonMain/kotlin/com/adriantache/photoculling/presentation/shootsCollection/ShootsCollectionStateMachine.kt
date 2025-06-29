@@ -15,9 +15,6 @@ fun ShootsCollectionStateMachine(
 ) {
     val state by stateFlow.collectAsState()
 
-    // TODO: remove
-    println("STATE: $state")
-
     LaunchedEffect(state) {
         when (val localState = state) {
             is ShootsCollectionState.AddShoot -> Unit

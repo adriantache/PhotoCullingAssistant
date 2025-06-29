@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 // TODO: DI
 object ShootsCollectionUseCase {
-    private val data: ShootsCollectionDataSource = ShootsCollectionDataSourceImpl()
+    private val data: ShootsCollectionDataSource = ShootsCollectionDataSourceImpl
     private val navigation = NavigationUseCase
 
     private val scope = CoroutineScope(Dispatchers.IO)

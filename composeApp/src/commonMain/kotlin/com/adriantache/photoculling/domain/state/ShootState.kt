@@ -7,6 +7,7 @@ sealed interface ShootState {
 
     data class Content(
         val shoot: ShootUi,
-        val onClickPhoto: (photoId: String) -> Unit,
+        val onClickPhoto: (photoId: String) -> Unit, // TODO: consider removing this?
+        val onNavigateToNextPhoto: (isForward: Boolean) -> Unit,
     ) : ShootState
 }

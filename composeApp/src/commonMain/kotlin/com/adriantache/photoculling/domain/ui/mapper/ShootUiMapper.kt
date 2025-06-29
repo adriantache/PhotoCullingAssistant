@@ -17,5 +17,6 @@ fun Shoot.toUi(selectedPhotoId: String?) = ShootUi(
     photos = photos.map { it.toUi() },
     progress = progress,
     selectedPhotoId = selectedPhotoId,
+    selectedPhoto = selectedPhotoId?.let { photos.first { it.id == selectedPhotoId }.toUi() },
     hasPhotos = photos.isNotEmpty(),
 )

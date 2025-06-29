@@ -7,5 +7,6 @@ data class ShootUi(
     val photos: List<PhotoUi>,
     val hasPhotos: Boolean,
     val selectedPhotoId: String?,
+    val selectedPhoto: PhotoUi?,
     val progress: Int,
 )

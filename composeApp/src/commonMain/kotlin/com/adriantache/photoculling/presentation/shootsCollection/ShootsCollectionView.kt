@@ -32,7 +32,7 @@ fun ShootsCollectionView(
             }
 
             items(items = state.shoots.shoots) {
-                Text(it.name)
+                Text(it.name, modifier = Modifier.clickable { state.onOpenShoot(it.id) })
             }
         }
     }
