@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.documentfile.provider.DocumentFile
+import com.adriantache.photoculling.platform.AndroidContextHolder
 import com.adriantache.photoculling.platform.PhotoPickerHelper
 
 class MainActivity : ComponentActivity() {
@@ -22,6 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         registerResultLauncher()
+        AndroidContextHolder.appContext = this
 
         setContent {
             App()

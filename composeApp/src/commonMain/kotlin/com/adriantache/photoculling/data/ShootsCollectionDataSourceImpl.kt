@@ -8,6 +8,7 @@ import com.adriantache.photoculling.domain.data.ShootsCollectionDataSource
 import com.adriantache.photoculling.domain.data.model.PhotoData
 import com.adriantache.photoculling.domain.data.model.ShootData
 import com.adriantache.photoculling.domain.data.model.ShootsCollectionData
+import com.adriantache.photoculling.platform.getFilePath
 import kotlinx.serialization.json.Json
 import java.io.File
 import kotlin.uuid.ExperimentalUuidApi
@@ -78,7 +79,7 @@ object ShootsCollectionDataSourceImpl : ShootsCollectionDataSource {
     }
 
     private fun getShootsFromFile(): ShootsCollectionDto? {
-        val file = File(FILE_NAME)
+        val file = getFile()
 
         if (!file.exists()) return null
 
@@ -88,11 +89,13 @@ object ShootsCollectionDataSourceImpl : ShootsCollectionDataSource {
     }
 
     private fun saveShootsToFile() {
-        val file = File(FILE_NAME)
+        val file = getFile()
         val json = fileStorage?.let { Json.encodeToString(it) } ?: return
 
         if (!file.exists()) file.createNewFile()
 
         file.writeText(json)
     }
+
+    private fun getFile(): File = File(getFilePath(FILE_NAME))
 }
