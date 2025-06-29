@@ -45,5 +45,8 @@ actual fun getFilePath(fileName: String): String {
     val home = System.getProperty("user.home")
         ?: throw IllegalStateException("No user.home property")
 
-    return "$home/Downloads/PhotoCullingAssistant/$fileName"
+    val path = "$home/Downloads/PhotoCullingAssistant"
+    File(path).mkdirs()
+
+    return "$path/$fileName"
 }
