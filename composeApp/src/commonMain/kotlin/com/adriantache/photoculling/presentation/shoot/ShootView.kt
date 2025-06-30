@@ -16,6 +16,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.adriantache.photoculling.BACKGROUND_COLOR
 import com.adriantache.photoculling.domain.state.ShootState
+import com.adriantache.photoculling.platform.coilLoader
+import com.adriantache.photoculling.platform.coilPlatformContext
+import com.adriantache.photoculling.presentation.util.preloadImage
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -24,6 +28,25 @@ fun ShootView(localState: ShootState.Content) {
         var dragOffsetX by remember { mutableStateOf(0f) }
         val threshold = 150f // TODO: set threshold based on platform
         val animatedOffsetX by animateFloatAsState(targetValue = dragOffsetX)
+
+        val imageLoader = remember { coilLoader }
+        val platformContext = remember { coilPlatformContext }
+
+        LaunchedEffect(localState.shoot, imageLoader) {
+            imageLoader?.let { imageLoader ->
+                platformContext?.let { platformContext ->
+                    localState.shoot.photos.forEach {
+                        launch {
+                            preloadImage(
+                                context = platformContext,
+                                imageLoader = imageLoader,
+                                data = it.uri.fixUri(),
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
         Box(
             modifier = Modifier.fillMaxSize().background(BACKGROUND_COLOR).padding(vertical = 16.dp)
