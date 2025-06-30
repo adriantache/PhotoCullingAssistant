@@ -19,6 +19,10 @@ private const val FILE_NAME = "shoots.json"
 // TODO: use DI and make this a class instead
 object ShootsCollectionDataSourceImpl : ShootsCollectionDataSource {
     private var fileStorage = getShootsFromFile()
+        set(value) {
+            field = value
+            saveShootsToFile()
+        }
 
     override suspend fun getShoots(): ShootsCollectionData? {
         return fileStorage?.toData()
@@ -64,14 +68,14 @@ object ShootsCollectionDataSourceImpl : ShootsCollectionDataSource {
             ?: throw IllegalArgumentException("Cannot find shoot id $shootId in $fileStorage!")
 
         val updatedPhotos = shoot.photos.map {
-            if (it.id != photo.id) it
+            if (it.id != photo.id) return@map it
 
             photo.toDto()
         }
 
         this.fileStorage = fileStorage.copy(
             shoots = fileStorage.shoots.map {
-                if (it.id != shootId) it
+                if (it.id != shootId) return@map it
 
                 it.copy(photos = updatedPhotos)
             }

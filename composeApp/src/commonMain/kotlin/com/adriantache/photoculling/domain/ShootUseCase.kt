@@ -2,6 +2,7 @@ package com.adriantache.photoculling.domain
 
 import com.adriantache.photoculling.data.ShootsCollectionDataSourceImpl
 import com.adriantache.photoculling.domain.data.ShootsCollectionDataSource
+import com.adriantache.photoculling.domain.data.mapper.toData
 import com.adriantache.photoculling.domain.data.mapper.toEntity
 import com.adriantache.photoculling.domain.entity.Shoot
 import com.adriantache.photoculling.domain.navigation.NavigationUseCase
@@ -33,12 +34,14 @@ object ShootUseCase {
         loadShoot(shootId)
     }
 
-    private fun loadShoot(shootId: String) {
+    private fun loadShoot(shootId: String, autoselectPhotoId: Boolean = true) {
         scope.launch {
             shoot = data.getShoot(shootId).toEntity()
 
-            shoot?.let { shoot ->
-                selectedPhotoId = shoot.photos.firstOrNull { !it.isSeen }?.id ?: shoot.photos.first().id
+            if (autoselectPhotoId) {
+                shoot?.let { shoot ->
+                    selectedPhotoId = shoot.photos.firstOrNull { !it.isSeen }?.id ?: shoot.photos.first().id
+                }
             }
 
             updateState()
@@ -55,7 +58,7 @@ object ShootUseCase {
                     selectedPhotoId = it
                     navigation.openPhoto(it)
                 },
-                onNavigateToNextPhoto = { isForward ->
+                onNavigateToNextPhoto = { isForward -> // TODO: implement isSeen logic
                     val currentSelectedPhotoIndex = shoot.photos.indexOfFirst { it.id == selectedPhotoId }
                     // TODO: add end condition
                     val nextIndex = if (isForward && currentSelectedPhotoIndex < (shoot.photos.size - 1)) {
@@ -68,8 +71,18 @@ object ShootUseCase {
 
                     selectedPhotoId = shoot.photos[nextIndex].id
                     updateState()
+                },
+                onSetRating = { rating ->
+                    getSelectedPhoto()?.let { selectedPhoto ->
+                        scope.launch {
+                            data.updatePhoto(shoot.id, selectedPhoto.copy(rating = rating).toData())
+                            loadShoot(shoot.id, autoselectPhotoId = false)
+                        }
+                    }
                 }
             )
         }
     }
+
+    private fun getSelectedPhoto() = shoot?.photos?.firstOrNull { it.id == selectedPhotoId }
 }

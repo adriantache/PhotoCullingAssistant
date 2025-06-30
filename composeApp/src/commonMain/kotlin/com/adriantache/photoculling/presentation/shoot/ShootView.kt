@@ -58,11 +58,11 @@ fun ShootView(localState: ShootState.Content) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxSize()) {
-            VotingView({})
+            VotingView(rating = localState.shoot.selectedPhoto?.rating, onVote = { localState.onSetRating(it) })
 
             Box(modifier = Modifier.weight(1f))
 
-            VotingView({})
+            VotingView(rating = localState.shoot.selectedPhoto?.rating, onVote = { localState.onSetRating(it) })
         }
 
         Text(

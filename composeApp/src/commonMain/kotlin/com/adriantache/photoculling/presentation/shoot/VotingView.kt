@@ -9,7 +9,6 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,11 +20,13 @@ import androidx.compose.ui.unit.dp
 import com.adriantache.photoculling.platform.rememberHapticController
 import com.adriantache.photoculling.presentation.util.Spacer
 import org.jetbrains.compose.resources.InternalResourceApi
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(InternalResourceApi::class)
 @Composable
-fun VotingView(onVote: (rating: Int) -> Unit) {
+fun VotingView(
+    rating: Int?,
+    onVote: (rating: Int) -> Unit,
+) {
     // TODO: figure out the haptic situation :/ 
     val haptic = LocalHapticFeedback.current
     val backupHaptic = rememberHapticController()
@@ -33,12 +34,16 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
     val iconSize = 32.dp
     val iconSpacing = 4.dp
 
-    var votingValue: Int? by remember { mutableStateOf(null) }
+    var votingValue: Int? by remember { mutableStateOf(rating) }
     var dragOffsetY by remember { mutableStateOf(0f) }
     val starThreshold = 100f // TODO: set threshold based on platform
     val largeThreshold = 300f // TODO: set threshold based on platform
 
     val selectedColor = Color.White
+
+    LaunchedEffect(rating) {
+        votingValue = rating
+    }
 
     LaunchedEffect(votingValue) {
         val vote = votingValue ?: return@LaunchedEffect
@@ -145,13 +150,5 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
                 modifier = Modifier.size(iconSize * 2)
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun VotingViewPreview() {
-    MaterialTheme {
-        VotingView {}
     }
 }

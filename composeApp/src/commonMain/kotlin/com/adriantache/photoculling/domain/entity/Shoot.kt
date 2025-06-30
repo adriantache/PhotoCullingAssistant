@@ -5,7 +5,8 @@ import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-data class Shoot @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class) constructor(
+@OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
+data class Shoot(
     val id: String = Uuid.random().toString(),
     val name: String = "",
     val date: Long = Clock.System.now().toEpochMilliseconds(),
