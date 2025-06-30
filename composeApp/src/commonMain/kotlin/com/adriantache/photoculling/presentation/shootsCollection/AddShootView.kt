@@ -1,14 +1,18 @@
 package com.adriantache.photoculling.presentation.shootsCollection
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.adriantache.photoculling.domain.state.ShootsCollectionState
 import com.adriantache.photoculling.platform.getPhotoPickerResults
 import com.adriantache.photoculling.platform.pickPhotos
@@ -31,27 +35,57 @@ fun AddShootView(localState: ShootsCollectionState.AddShoot) {
         showAddShootDialog = false
     }
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
-        TextField(
-            value = localState.shoot.name,
-            onValueChange = localState.onSetName,
-        )
+    Dialog(onDismissRequest = { localState.onDismiss() }) {
+        Column(
+            Modifier.background(Color(0xff8D8C7B), RoundedCornerShape(16.dp)).padding(32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text("Add Shoot", style = MaterialTheme.typography.headlineMedium, color = Color(0xffF3F0E8))
 
-        Spacer(16.dp)
+            Spacer(32.dp)
 
-        Button(onClick = { showAddShootDialog = true }) {
-            Text("Add Photos")
-        }
-
-        Spacer(16.dp)
-
-        addedPhotos?.let { addedPhotos ->
-            Text("Added Photos: ${addedPhotos.size}")
+            TextField(
+                modifier = Modifier.width(300.dp),
+                label = { Text("Shoot Name") },
+                value = localState.shoot.name,
+                onValueChange = localState.onSetName,
+            )
 
             Spacer(16.dp)
 
-            Button(onClick = { localState.onSubmit() }) {
-                Text("Submit")
+            if (addedPhotos == null) {
+                Button(
+                    modifier = Modifier.width(300.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = { showAddShootDialog = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xffF3F0E8),
+                        contentColor = Color(0xff8D8C7B),
+                    )
+                ) {
+                    Text("Add Photos")
+                }
+
+                Spacer(16.dp)
+            }
+
+            addedPhotos?.let { addedPhotos ->
+                Text("Added Photos: ${addedPhotos.size}")
+
+                Spacer(16.dp)
+
+                Button(
+                    modifier = Modifier.width(300.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = { localState.onSubmit() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xffF3F0E8),
+                        contentColor = Color(0xff8D8C7B),
+                    )
+                ) {
+                    Text("Submit")
+                }
             }
         }
     }

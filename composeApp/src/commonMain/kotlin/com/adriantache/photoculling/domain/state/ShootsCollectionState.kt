@@ -10,7 +10,7 @@ sealed interface ShootsCollectionState {
         val shoots: ShootsCollectionUi,
         val onAddShoot: () -> Unit,
         val onOpenShoot: (shootId: String) -> Unit,
-//        val onDeleteShoot: () -> Unit, TODO
+        val onDeleteShoot: (shootId: String) -> Unit,
 //        val onEditShoot: () -> Unit, TODO
     ) : ShootsCollectionState
 
@@ -19,5 +19,6 @@ sealed interface ShootsCollectionState {
         val onSetName: (String) -> Unit,
         val onSetPhotos: (List<String>) -> Unit,
         val onSubmit: () -> Unit,
+        val onDismiss: () -> Unit,
     ) : ShootsCollectionState
 }

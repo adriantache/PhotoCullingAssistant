@@ -8,12 +8,10 @@ import com.adriantache.photoculling.domain.navigation.model.NavigationState.*
 import com.adriantache.photoculling.presentation.shoot.ShootStateMachine
 import com.adriantache.photoculling.presentation.shootsCollection.ShootsCollectionStateMachine
 
+// TODO: hook navigation into back gestures
 @Composable
 fun NavigationView() {
     val navigationState by NavigationUseCase.state.collectAsState()
-
-    // TODO: remove
-    println("Nav state: $navigationState")
 
     when (val state = navigationState) {
         is PhotoDestination -> TODO() // TODO: probably remove this destination (when I rethink shootdestination overview)

@@ -1,5 +1,7 @@
 package com.adriantache.photoculling.presentation.shoot
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -29,33 +31,32 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
     val backupHaptic = rememberHapticController()
 
     val iconSize = 32.dp
-    val iconSpacing = 8.dp
+    val iconSpacing = 4.dp
 
-    var votingValue: Int? by remember { mutableStateOf(null) }
+    var votingValue: Int by remember { mutableIntStateOf(-1) }
     var dragOffsetY by remember { mutableStateOf(0f) }
-    val threshold = 100f // TODO: set threshold based on platform
+    val starThreshold = 100f // TODO: set threshold based on platform
+    val largeThreshold = 300f // TODO: set threshold based on platform
 
     val selectedColor = Color.White
-    val deselectedColor = Color.LightGray.copy(0.5f)
-
 
     LaunchedEffect(votingValue) {
-        if (votingValue == null) return@LaunchedEffect
+        if (votingValue == -1) return@LaunchedEffect
 
-        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
-        backupHaptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+        val hapticGesture = when (votingValue) {
+            6 -> HapticFeedbackType.Confirm
+            0 -> HapticFeedbackType.Reject
+            else -> HapticFeedbackType.SegmentTick
+        }
+
+        haptic.performHapticFeedback(hapticGesture)
+        backupHaptic.performHapticFeedback(hapticGesture)
     }
 
-    fun getIconColor(index: Int, currentValue: Int?): Color {
-        return when {
-            currentValue == null -> deselectedColor
-            index == 0 && currentValue == 0 -> selectedColor
-            index == 0 && currentValue != 0 -> deselectedColor
-            index == 7 && currentValue == 7 -> selectedColor
-            index == 7 && currentValue != 7 -> deselectedColor
-            index <= currentValue -> selectedColor
-            else -> deselectedColor
-        }
+    fun getStarVisibility(index: Int): Boolean {
+        if (votingValue == 0 || votingValue == 6 || votingValue == -1) return false
+
+        return votingValue >= index + 1
     }
 
     Column(
@@ -70,15 +71,23 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
                         dragOffsetY += dragAmount.y
                         change.consume()
 
+                        val threshold = if (
+                            (votingValue == 1 && dragOffsetY > 0) || (votingValue == 5 && dragOffsetY < 0)
+                        ) {
+                            largeThreshold
+                        } else {
+                            starThreshold
+                        }
+
                         // as long as we’ve crossed the +threshold, increment and pull the offset back
                         while (dragOffsetY > threshold) {
-                            votingValue = ((votingValue ?: 0) - 1).coerceAtLeast(-1)
+                            votingValue = (votingValue - 1).coerceAtLeast(-1)
                             dragOffsetY -= threshold
                         }
 
                         // as long as we’ve crossed the -threshold, decrement and pull the offset back
                         while (dragOffsetY < -threshold) {
-                            votingValue = ((votingValue ?: 0) + 1).coerceIn(1, 7)
+                            votingValue = (votingValue + 1).coerceIn(1, 6)
                             dragOffsetY += threshold
                         }
                     },
@@ -94,32 +103,45 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(
-            imageVector = Icons.Outlined.Favorite,
-            contentDescription = "Favorite",
-            tint = getIconColor(7, votingValue),
-            modifier = Modifier.size(iconSize)
-        )
-
-        Spacer(iconSpacing)
+        val durationMillis = 800
+        AnimatedVisibility(
+            visible = votingValue == 6,
+            enter = expandVertically(tween(durationMillis / 2)) + fadeIn(tween(durationMillis)),
+            exit = fadeOut(tween(durationMillis)) + shrinkVertically(tween(durationMillis / 2)),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Favorite,
+                contentDescription = "Favorite",
+                tint = selectedColor,
+                modifier = Modifier.size(iconSize * 2)
+            )
+        }
 
         repeat(5) {
-            Icon(
-                imageVector = Icons.Outlined.Star,
-                contentDescription = "Vote $it",
-                tint = getIconColor(5 - it, votingValue),
-                modifier = Modifier.size(iconSize)
-            )
+            AnimatedVisibility(getStarVisibility(5 - it - 1)) {
+                Icon(
+                    imageVector = Icons.Outlined.Star,
+                    contentDescription = "Vote $it",
+                    tint = selectedColor,
+                    modifier = Modifier.size(iconSize)
+                )
+            }
 
             Spacer(iconSpacing)
         }
 
-        Icon(
-            imageVector = Icons.Outlined.Cancel,
-            contentDescription = "Decline",
-            tint = getIconColor(0, votingValue),
-            modifier = Modifier.size(iconSize)
-        )
+        AnimatedVisibility(
+            visible = votingValue == 0,
+            enter = fadeIn(tween(durationMillis)) + expandVertically(tween(durationMillis / 2)),
+            exit = fadeOut(tween(durationMillis)) + shrinkVertically(tween(durationMillis / 2)),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Cancel,
+                contentDescription = "Decline",
+                tint = selectedColor,
+                modifier = Modifier.size(iconSize * 2)
+            )
+        }
     }
 }
 

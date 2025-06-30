@@ -57,6 +57,12 @@ object ShootsCollectionUseCase {
                     shoots = shootsCollection.toUi(),
                     onAddShoot = ::onAddShoot,
                     onOpenShoot = { navigation.openShoot(it) },
+                    onDeleteShoot = { id ->
+                        scope.launch {
+                            data.deleteShoot(shootsCollection.shoots.first { it.id == id }.toData())
+                            refreshStoredShoots()
+                        }
+                    }
                 )
             }
         }
@@ -81,6 +87,9 @@ object ShootsCollectionUseCase {
                             newShoot = null
                             refreshStoredShoots()
                         }
+                    },
+                    onDismiss = {
+                        updateState()
                     }
                 )
             }
