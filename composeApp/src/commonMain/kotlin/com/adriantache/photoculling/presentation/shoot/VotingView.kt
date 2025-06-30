@@ -33,7 +33,7 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
     val iconSize = 32.dp
     val iconSpacing = 4.dp
 
-    var votingValue: Int by remember { mutableIntStateOf(-1) }
+    var votingValue: Int? by remember { mutableStateOf(null) }
     var dragOffsetY by remember { mutableStateOf(0f) }
     val starThreshold = 100f // TODO: set threshold based on platform
     val largeThreshold = 300f // TODO: set threshold based on platform
@@ -41,11 +41,13 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
     val selectedColor = Color.White
 
     LaunchedEffect(votingValue) {
-        if (votingValue == -1) return@LaunchedEffect
+        val vote = votingValue ?: return@LaunchedEffect
 
-        val hapticGesture = when (votingValue) {
+        onVote(vote)
+
+        val hapticGesture = when (vote) {
             6 -> HapticFeedbackType.Confirm
-            0 -> HapticFeedbackType.Reject
+            -1 -> HapticFeedbackType.Reject
             else -> HapticFeedbackType.SegmentTick
         }
 
@@ -54,9 +56,9 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
     }
 
     fun getStarVisibility(index: Int): Boolean {
-        if (votingValue == 0 || votingValue == 6 || votingValue == -1) return false
+        if (votingValue == null || votingValue == 6 || votingValue == -1) return false
 
-        return votingValue >= index + 1
+        return votingValue!! >= index + 1
     }
 
     Column(
@@ -72,7 +74,8 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
                         change.consume()
 
                         val threshold = if (
-                            (votingValue == 1 && dragOffsetY > 0) || (votingValue == 5 && dragOffsetY < 0)
+                            (votingValue == 1 && dragOffsetY > 0) || (votingValue == 5 && dragOffsetY < 0) ||
+                            (votingValue == -1 && dragOffsetY < 0) || (votingValue == 6 && dragOffsetY < 0)
                         ) {
                             largeThreshold
                         } else {
@@ -81,13 +84,13 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
 
                         // as long as we’ve crossed the +threshold, increment and pull the offset back
                         while (dragOffsetY > threshold) {
-                            votingValue = (votingValue - 1).coerceAtLeast(-1)
+                            votingValue = ((votingValue ?: 0) - 1).coerceAtLeast(-1)
                             dragOffsetY -= threshold
                         }
 
                         // as long as we’ve crossed the -threshold, decrement and pull the offset back
                         while (dragOffsetY < -threshold) {
-                            votingValue = (votingValue + 1).coerceIn(1, 6)
+                            votingValue = ((votingValue ?: 0) + 1).coerceIn(0, 6)
                             dragOffsetY += threshold
                         }
                     },
@@ -131,7 +134,7 @@ fun VotingView(onVote: (rating: Int) -> Unit) {
         }
 
         AnimatedVisibility(
-            visible = votingValue == 0,
+            visible = votingValue == -1,
             enter = fadeIn(tween(durationMillis)) + expandVertically(tween(durationMillis / 2)),
             exit = fadeOut(tween(durationMillis)) + shrinkVertically(tween(durationMillis / 2)),
         ) {

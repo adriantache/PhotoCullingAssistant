@@ -2,7 +2,6 @@ package com.adriantache.photoculling.platform
 
 import android.os.Build
 import android.os.VibrationEffect
-import android.os.VibrationEffect.EFFECT_TICK
 import android.os.Vibrator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -14,12 +13,30 @@ actual fun rememberHapticController(): HapticController {
     return object : HapticController {
         val vibrator = remember { AndroidContextHolder.appContext.getSystemService<Vibrator>() }
 
-        override fun performHapticFeedback(type: HapticFeedbackType) { // TODO: implement type?
+        override fun performHapticFeedback(type: HapticFeedbackType) {
+            val (duration, amplitude) = getConfig(type)
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                vibrator?.vibrate(VibrationEffect.createPredefined(EFFECT_TICK))
+                vibrator?.vibrate(
+                    VibrationEffect.createOneShot(
+                        duration,
+                        amplitude,
+                    )
+                )
             } else {
                 @Suppress("DEPRECATION")
                 vibrator?.vibrate(20L)
+            }
+        }
+
+        private fun getConfig(type: HapticFeedbackType): Pair<Long, Int> {
+            return when (type) {
+                HapticFeedbackType.Confirm -> 100L to 128
+                HapticFeedbackType.Reject -> 100L to VibrationEffect.DEFAULT_AMPLITUDE
+                HapticFeedbackType.SegmentTick -> 50L to VibrationEffect.DEFAULT_AMPLITUDE
+
+                // fallback for any other / future types
+                else -> 50L to VibrationEffect.DEFAULT_AMPLITUDE
             }
         }
     }
