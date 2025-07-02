@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.adriantache.photoculling.BACKGROUND_COLOR
 import com.adriantache.photoculling.domain.state.ShootState
+import com.adriantache.photoculling.platform.KeepScreenOnAndBright
 import com.adriantache.photoculling.platform.rememberHapticController
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -24,6 +25,8 @@ import kotlin.math.roundToInt
 @Composable
 fun ShootView(localState: ShootState.Content) {
     val hapticController = rememberHapticController()
+
+    KeepScreenOnAndBright()
 
     localState.shoot.selectedPhoto?.let { selectedPhoto ->
         var dragOffsetX by remember { mutableStateOf(0f) }

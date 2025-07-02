@@ -9,9 +9,6 @@ The goal of this app is to very easily navigate through and cull
 ### Core
 
 - save rating / pick status to EXIF as a sidecar file XMP format
-- auto import photos by folder name (use OS media picker)
-- 5+2 star rating : PICK x x x x x REJECT
-- full brightness while voting, screen always on
 
 ### Important
 
