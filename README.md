@@ -2,19 +2,20 @@
 
 An app to assist with quickly and easily culling photos after a shoot, from your tablet or laptop.
 
-The goal of this app is to very easily navigate through and cull
+The goal of this app is to very easily navigate through and cull photos, resulting in files which can then be added to
+the folder with the RAWs in order to automatically be imported to your photo editor of choice.
 
 ## TODO:
 
 ### Core
 
 - save rating / pick status to EXIF as a sidecar file XMP format
+- subfolders per shoot, maintain DCIM folder structure
 
 ### Important
 
-- subfolders per shoot, maintain DCIM folder structure
-- culling progress indicator
-- pinch to zoom
+- culling progress indicator (to be improved)
+- pinch to zoom (probably not, too many gestures!)
 - Desktop functionality (lower priority)
 
 ### Nice to have
@@ -26,4 +27,3 @@ The goal of this app is to very easily navigate through and cull
 - quick overview, a fast way to see more details about culling progress (photos grouped by stars in shoot view?)
 - DONE animation when finishing rating a shoot
 - (maybe) auto-advance after voting (option)
-- (maybe) long press to hide UI / also when pinch to zoom
