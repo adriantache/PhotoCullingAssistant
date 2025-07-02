@@ -17,13 +17,13 @@ fun CacheView(
     shoot: ShootUi,
     selectedPhoto: PhotoUi
 ) {
-    val index: Int? by remember { mutableStateOf(null) }
+    var index: Int? by remember(selectedPhoto) { mutableStateOf(null) }
 
     LaunchedEffect(selectedPhoto) {
         launch {
-            delay(2000)
+            delay(1000)
 
-            shoot.photos.indexOfFirst { it.id == selectedPhoto.id }
+            index = shoot.photos.indexOfFirst { it.id == selectedPhoto.id }
         }
     }
     index?.let { index ->

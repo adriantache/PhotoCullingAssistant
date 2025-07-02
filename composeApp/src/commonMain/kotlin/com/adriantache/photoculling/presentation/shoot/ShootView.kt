@@ -10,27 +10,30 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.adriantache.photoculling.BACKGROUND_COLOR
 import com.adriantache.photoculling.domain.state.ShootState
+import com.adriantache.photoculling.platform.rememberHapticController
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
 fun ShootView(localState: ShootState.Content) {
+    val hapticController = rememberHapticController()
+
     localState.shoot.selectedPhoto?.let { selectedPhoto ->
         var dragOffsetX by remember { mutableStateOf(0f) }
         val threshold = 150f // TODO: set threshold based on platform
         val animatedOffsetX by animateFloatAsState(targetValue = dragOffsetX)
 
-        LaunchedEffect(localState.shoot) {
-            //preloadImages(localState.shoot.photos.map { it.uri })
-        }
-
         Box(
-            modifier = Modifier.fillMaxSize().background(BACKGROUND_COLOR).padding(16.dp)
+            modifier = Modifier.fillMaxSize()
+                .background(BACKGROUND_COLOR)
+                .padding(horizontal = 32.dp, vertical = 16.dp)
                 .offset { IntOffset(animatedOffsetX.roundToInt(), 0) },
             contentAlignment = Alignment.Center,
         ) {
@@ -46,6 +49,10 @@ fun ShootView(localState: ShootState.Content) {
                         onDrag = { change, dragAmount ->
                             dragOffsetX += dragAmount.x
                             change.consume()
+
+                            if (abs(dragOffsetX) > threshold) {
+                                hapticController.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                            }
                         },
                         onDragEnd = {
                             when {

@@ -6,7 +6,6 @@ import com.adriantache.photoculling.domain.data.mapper.toData
 import com.adriantache.photoculling.domain.data.mapper.toEntity
 import com.adriantache.photoculling.domain.entity.Photo
 import com.adriantache.photoculling.domain.entity.Shoot
-import com.adriantache.photoculling.domain.navigation.NavigationUseCase
 import com.adriantache.photoculling.domain.state.ShootState
 import com.adriantache.photoculling.domain.ui.mapper.toUi
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +17,6 @@ import kotlinx.coroutines.launch
 // TODO: DI
 object ShootUseCase {
     private val data: ShootsCollectionDataSource = ShootsCollectionDataSourceImpl
-    private val navigation: NavigationUseCase = NavigationUseCase
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -58,12 +56,12 @@ object ShootUseCase {
                 onNavigateToNextPhoto = { isForward ->
                     val currentSelectedPhotoIndex = shoot.photos.indexOfFirst { it.id == selectedPhotoId }
 
-                    markAsSeen(shoot.id, shoot.photos.get(currentSelectedPhotoIndex))
+                    markAsSeen(shoot.id, shoot.photos[currentSelectedPhotoIndex])
 
                     // TODO: add end condition
                     val nextIndex = if (isForward && currentSelectedPhotoIndex < (shoot.photos.size - 1)) {
                         currentSelectedPhotoIndex + 1
-                    } else if (currentSelectedPhotoIndex > 0) {
+                    } else if (!isForward && currentSelectedPhotoIndex > 0) {
                         currentSelectedPhotoIndex - 1
                     } else {
                         currentSelectedPhotoIndex // TODO: rethink this case

@@ -40,10 +40,7 @@ fun VotingView(
     var dragOffsetY by remember { mutableStateOf(0f) }
 
     var isUiVisible by remember { mutableStateOf(true) }
-    val uiAlpha by animateFloatAsState(
-        targetValue = if (isUiVisible) 1f else 0f,
-        animationSpec = tween(2000),
-    )
+    val uiAlpha by animateFloatAsState(targetValue = if (isUiVisible) 1f else 0f)
 
     val starThreshold = 100f // TODO: set threshold based on platform
     val largeThreshold = 300f // TODO: set threshold based on platform
