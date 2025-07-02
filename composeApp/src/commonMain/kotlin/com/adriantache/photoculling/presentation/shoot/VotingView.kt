@@ -1,6 +1,7 @@
 package com.adriantache.photoculling.presentation.shoot
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
@@ -12,13 +13,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.adriantache.photoculling.platform.rememberHapticController
 import com.adriantache.photoculling.presentation.util.Spacer
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.InternalResourceApi
 
 @OptIn(InternalResourceApi::class)
@@ -27,8 +30,7 @@ fun VotingView(
     rating: Int?,
     onVote: (rating: Int) -> Unit,
 ) {
-    // TODO: figure out the haptic situation :/ 
-    val haptic = LocalHapticFeedback.current
+    // TODO: try to make the compose haptic work?
     val backupHaptic = rememberHapticController()
 
     val iconSize = 32.dp
@@ -36,6 +38,13 @@ fun VotingView(
 
     var votingValue: Int? by remember { mutableStateOf(rating) }
     var dragOffsetY by remember { mutableStateOf(0f) }
+
+    var isUiVisible by remember { mutableStateOf(true) }
+    val uiAlpha by animateFloatAsState(
+        targetValue = if (isUiVisible) 1f else 0f,
+        animationSpec = tween(2000),
+    )
+
     val starThreshold = 100f // TODO: set threshold based on platform
     val largeThreshold = 300f // TODO: set threshold based on platform
 
@@ -43,6 +52,17 @@ fun VotingView(
 
     LaunchedEffect(rating) {
         votingValue = rating
+        isUiVisible = true
+    }
+
+    LaunchedEffect(isUiVisible) {
+        if (!isUiVisible) return@LaunchedEffect
+
+        launch {
+            delay(3000)
+
+            isUiVisible = false
+        }
     }
 
     LaunchedEffect(votingValue) {
@@ -56,7 +76,6 @@ fun VotingView(
             else -> HapticFeedbackType.SegmentTick
         }
 
-        haptic.performHapticFeedback(hapticGesture)
         backupHaptic.performHapticFeedback(hapticGesture)
     }
 
@@ -67,7 +86,9 @@ fun VotingView(
     }
 
     Column(
-        modifier = Modifier.fillMaxHeight().width(150.dp)
+        modifier = Modifier.fillMaxHeight()
+            .width(150.dp)
+            .alpha(uiAlpha)
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = {

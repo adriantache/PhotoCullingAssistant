@@ -1,6 +1,8 @@
 package com.adriantache.photoculling.presentation.shootsCollection
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,9 +13,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.adriantache.photoculling.BACKGROUND_COLOR
 import com.adriantache.photoculling.domain.state.ShootsCollectionState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import photocullingassistant.composeapp.generated.resources.Res
 import photocullingassistant.composeapp.generated.resources.adrian_tache_white
@@ -21,6 +31,16 @@ import photocullingassistant.composeapp.generated.resources.adrian_tache_white
 @Composable
 fun ShootsCollectionView(state: ShootsCollectionState.Content) {
     var showDeleteShootDialog: String? by remember { mutableStateOf(null) }
+    var timingVariable by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        launch {
+            while (true) {
+                delay(8000)
+                timingVariable++
+            }
+        }
+    }
 
     Column(Modifier.fillMaxSize().padding(top = 32.dp, start = 32.dp, end = 32.dp)) {
         FlowRow(
@@ -55,6 +75,12 @@ fun ShootsCollectionView(state: ShootsCollectionState.Content) {
                     ) {
                         val interactionSource = remember { MutableInteractionSource() }
 
+                        var displayedImage by remember { mutableStateOf(shoot.photos.random()) }
+
+                        LaunchedEffect(timingVariable) {
+                            displayedImage = shoot.photos.random()
+                        }
+
                         Box(
                             modifier = Modifier
                                 .size(200.dp, 150.dp)
@@ -64,13 +90,48 @@ fun ShootsCollectionView(state: ShootsCollectionState.Content) {
                                     onClick = { state.onOpenShoot(shoot.id) },
                                     onLongClick = { showDeleteShootDialog = shoot.id }
                                 ),
-                            contentAlignment = Alignment.Center,
+                            contentAlignment = Alignment.BottomCenter,
                         ) {
-                            Text(
-                                text = shoot.name.uppercase(),
-                                color = Color(0xccF4ECF2),
-                                style = MaterialTheme.typography.headlineSmall,
-                            )
+                            AnimatedContent(
+                                displayedImage,
+                                transitionSpec = {
+                                    fadeIn(animationSpec = tween(3000, delayMillis = 90))
+                                        .togetherWith(fadeOut(animationSpec = tween(3000)))
+                                }
+                            ) { image ->
+                                AsyncImage(
+                                    model = image.uri,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+
+                                    )
+                            }
+
+                            Surface(Modifier.fillMaxSize(), color = BACKGROUND_COLOR.copy(0.2f)) {}
+
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                                    .background(
+                                        brush = Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color(0x01000000),
+                                                Color(0x88000000)
+                                            ),
+                                        )
+                                    )
+                                    .padding(bottom = 8.dp, top = 16.dp)
+                                    .padding(horizontal = 16.dp),
+                                contentAlignment = Alignment.CenterStart,
+                            ) {
+                                Text(
+                                    text = shoot.name.uppercase(),
+                                    color = Color(0xccF4ECF2),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Black,
+                                )
+                            }
                         }
                     }
                 }

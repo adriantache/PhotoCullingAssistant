@@ -16,10 +16,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.adriantache.photoculling.BACKGROUND_COLOR
 import com.adriantache.photoculling.domain.state.ShootState
-import com.adriantache.photoculling.platform.coilLoader
-import com.adriantache.photoculling.platform.coilPlatformContext
-import com.adriantache.photoculling.presentation.util.preloadImage
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -29,34 +25,21 @@ fun ShootView(localState: ShootState.Content) {
         val threshold = 150f // TODO: set threshold based on platform
         val animatedOffsetX by animateFloatAsState(targetValue = dragOffsetX)
 
-        val imageLoader = remember { coilLoader }
-        val platformContext = remember { coilPlatformContext }
-
-        LaunchedEffect(localState.shoot, imageLoader) {
-            imageLoader?.let { imageLoader ->
-                platformContext?.let { platformContext ->
-                    localState.shoot.photos.forEach {
-                        launch {
-                            preloadImage(
-                                context = platformContext,
-                                imageLoader = imageLoader,
-                                data = it.uri.fixUri(),
-                            )
-                        }
-                    }
-                }
-            }
+        LaunchedEffect(localState.shoot) {
+            //preloadImages(localState.shoot.photos.map { it.uri })
         }
 
         Box(
-            modifier = Modifier.fillMaxSize().background(BACKGROUND_COLOR).padding(vertical = 16.dp)
+            modifier = Modifier.fillMaxSize().background(BACKGROUND_COLOR).padding(16.dp)
                 .offset { IntOffset(animatedOffsetX.roundToInt(), 0) },
             contentAlignment = Alignment.Center,
         ) {
+            CacheView(localState.shoot, selectedPhoto)
+
             CircularProgressIndicator(color = Color(0xffF3EDEB))
 
             AsyncImage(
-                model = selectedPhoto.uri.fixUri(),
+                model = selectedPhoto.uri,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize().pointerInput(Unit) {
                     detectDragGestures(
@@ -93,8 +76,4 @@ fun ShootView(localState: ShootState.Content) {
             modifier = Modifier.padding(16.dp)
         )
     }
-}
-
-private fun String.fixUri(): String {
-    return this.replace("file:/", "file:///")
 }

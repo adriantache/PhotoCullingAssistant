@@ -4,6 +4,7 @@ import com.adriantache.photoculling.data.ShootsCollectionDataSourceImpl
 import com.adriantache.photoculling.domain.data.ShootsCollectionDataSource
 import com.adriantache.photoculling.domain.data.mapper.toData
 import com.adriantache.photoculling.domain.data.mapper.toEntity
+import com.adriantache.photoculling.domain.entity.Photo
 import com.adriantache.photoculling.domain.entity.Shoot
 import com.adriantache.photoculling.domain.navigation.NavigationUseCase
 import com.adriantache.photoculling.domain.state.ShootState
@@ -54,12 +55,11 @@ object ShootUseCase {
         state.update {
             ShootState.Content(
                 shoot = shoot.toUi(selectedPhotoId),
-                onClickPhoto = {// TODO: probably remove this
-                    selectedPhotoId = it
-                    navigation.openPhoto(it)
-                },
-                onNavigateToNextPhoto = { isForward -> // TODO: implement isSeen logic
+                onNavigateToNextPhoto = { isForward ->
                     val currentSelectedPhotoIndex = shoot.photos.indexOfFirst { it.id == selectedPhotoId }
+
+                    markAsSeen(shoot.id, shoot.photos.get(currentSelectedPhotoIndex))
+
                     // TODO: add end condition
                     val nextIndex = if (isForward && currentSelectedPhotoIndex < (shoot.photos.size - 1)) {
                         currentSelectedPhotoIndex + 1
@@ -81,6 +81,12 @@ object ShootUseCase {
                     }
                 }
             )
+        }
+    }
+
+    private fun markAsSeen(shootId: String, photo: Photo) {
+        scope.launch {
+            data.updatePhoto(shootId = shootId, photo = photo.copy(isSeen = true).toData())
         }
     }
 

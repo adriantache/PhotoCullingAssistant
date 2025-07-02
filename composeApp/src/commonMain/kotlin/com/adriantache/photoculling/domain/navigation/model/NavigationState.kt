@@ -4,8 +4,15 @@ import com.adriantache.photoculling.domain.state.ShootState
 import com.adriantache.photoculling.domain.state.ShootsCollectionState
 import kotlinx.coroutines.flow.MutableStateFlow
 
-sealed interface NavigationState {
-    data class ShootsCollectionDestination(val state: MutableStateFlow<ShootsCollectionState>) : NavigationState
-    data class ShootDestination(val state: MutableStateFlow<ShootState>, val shootId: String) : NavigationState
-    data class PhotoDestination(val state: MutableStateFlow<ShootState>, val photoId: String) : NavigationState
+sealed class NavigationState(open val onBack: () -> Unit) {
+    data class ShootsCollectionDestination(
+        val state: MutableStateFlow<ShootsCollectionState>,
+        override val onBack: () -> Unit,
+    ) : NavigationState(onBack)
+
+    data class ShootDestination(
+        val state: MutableStateFlow<ShootState>,
+        val shootId: String,
+        override val onBack: () -> Unit,
+    ) : NavigationState(onBack)
 }

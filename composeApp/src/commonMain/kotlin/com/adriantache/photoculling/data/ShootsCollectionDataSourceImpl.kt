@@ -31,13 +31,18 @@ object ShootsCollectionDataSourceImpl : ShootsCollectionDataSource {
     // TODO: rethink this, new entity generation should probably be in the domain layer
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun addShoot(shoot: ShootData) {
-        val fileStorage = fileStorage ?: ShootsCollectionDto(
-            id = Uuid.random().toString(),
-            shoots = emptyList(),
+        val fileStorage = fileStorage
+            ?: ShootsCollectionDto(
+                id = Uuid.random().toString(),
+                shoots = emptyList(),
+            )
+
+        val fixedShoot = shoot.copy(
+            photos = shoot.photos.map { it.copy(uri = it.uri.fixUri()) }
         )
 
         this.fileStorage = fileStorage.copy(
-            shoots = fileStorage.shoots + shoot.toDto()
+            shoots = fileStorage.shoots + fixedShoot.toDto()
         )
         saveShootsToFile()
     }
@@ -102,4 +107,8 @@ object ShootsCollectionDataSourceImpl : ShootsCollectionDataSource {
     }
 
     private fun getFile(): File = File(getFilePath(FILE_NAME))
+
+    private fun String.fixUri(): String {
+        return this.replace("file:/", "file:///")
+    }
 }

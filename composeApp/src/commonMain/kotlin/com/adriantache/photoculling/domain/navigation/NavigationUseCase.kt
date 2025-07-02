@@ -8,18 +8,27 @@ import kotlinx.coroutines.flow.update
 
 // TODO: DI
 object NavigationUseCase {
-    val state: MutableStateFlow<NavigationState> =
-        MutableStateFlow(NavigationState.ShootsCollectionDestination(ShootsCollectionUseCase.state))
+    val state: MutableStateFlow<NavigationState> = MutableStateFlow(
+        NavigationState.ShootsCollectionDestination(
+            state = ShootsCollectionUseCase.state,
+            onBack = {}, // Root destination.
+        )
+    )
 
     fun openShoot(shootId: String) {
         state.update {
-            NavigationState.ShootDestination(state = ShootUseCase.state, shootId = shootId)
-        }
-    }
-
-    fun openPhoto(photoId: String) {
-        state.update {
-            NavigationState.PhotoDestination(state = ShootUseCase.state, photoId = photoId)
+            NavigationState.ShootDestination(
+                state = ShootUseCase.state,
+                shootId = shootId,
+                onBack = {
+                    state.update {
+                        NavigationState.ShootsCollectionDestination(
+                            state = ShootsCollectionUseCase.state,
+                            onBack = {}, // Root destination.
+                        )
+                    }
+                }
+            )
         }
     }
 }

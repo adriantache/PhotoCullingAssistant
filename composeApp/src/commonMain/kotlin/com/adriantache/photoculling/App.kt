@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import com.adriantache.photoculling.presentation.navigation.NavigationView
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-val BACKGROUND_COLOR = Color(0xff767676)
+val BACKGROUND_COLOR = Color(0xff434343)
 
 @Composable
 @Preview
